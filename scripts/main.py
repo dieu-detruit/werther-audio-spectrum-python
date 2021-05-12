@@ -29,8 +29,8 @@ class AudioSpectrumDrawer():
         self.audio_rate, self.voice = scipy.io.wavfile.read(self.wav_filename)
         self.voice = self.voice / 32768
         self.voice_length = self.voice.shape[0] / self.audio_rate
-        self.time = np.arange(
-            0, self.voice.shape[0] / self.audio_rate, 1/self.audio_rate)
+        self.time = np.linspace(
+            0, self.voice_length, self.voice.shape[0])
 
         # load background image
         self.bg_image = cv2.imread(self.bg_filename)
@@ -46,13 +46,16 @@ class AudioSpectrumDrawer():
         self.video_fps = 30.0
         self.K = int(self.audio_rate / self.video_fps)
 
-    def overlay_rgb(self, overlay_image, x, y):
+    def overlay_rgb(self, img, x, y):
 
         res = self.bg_image.copy()
         for i in range(3):
-            res[y:(y+overlay_image.shape[0]), x:(x+overlay_image.shape[1]), i] += \
-                (overlay_image[:, :, 3].astype(float) *
-                 overlay_image[:, :, i].astype(float) / 255.0).astype(np.uint8)
+            res[y:(y+img.shape[0]), x:(x+img.shape[1]), i] = \
+                np.clip(
+                    res[y:(y+img.shape[0]), x:(x+img.shape[1]), i].astype(np.float) +
+                    (img[:, :, 3].astype(np.float) *
+                     img[:, :, i].astype(np.float) / 255.0),
+                    0, 255).astype(np.uint8)
 
         return cv2.cvtColor(res, cv2.COLOR_BGRA2RGB)
 
