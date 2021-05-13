@@ -85,7 +85,8 @@ class AudioSpectrumDrawer():
 
         clip = mvpy.VideoClip(self.makeFrame, duration=self.voice_length)
         clip.audio = mvpy.AudioFileClip(self.wav_filename)
-        clip.write_videofile(self.output_filename, fps=self.video_fps)
+        clip.write_videofile(self.output_filename, fps=self.video_fps,
+                             codec='libx264', audio_codec='aac', remove_temp=True)
 
 
 if __name__ == '__main__':
